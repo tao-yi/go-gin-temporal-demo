@@ -2,12 +2,10 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tao-yi/go-gin-temporal-demo/activity"
+	"github.com/tao-yi/go-gin-temporal-demo/workflow"
 	"go.temporal.io/sdk/client"
-	"go.temporal.io/sdk/workflow"
 )
 
 func Hello(cli client.Client) gin.HandlerFunc {
@@ -20,7 +18,7 @@ func Hello(cli client.Client) gin.HandlerFunc {
 		}
 
 		ctx := context.Background()
-		r, err := cli.ExecuteWorkflow(ctx, options, HelloWorkflow, name)
+		r, err := cli.ExecuteWorkflow(ctx, options, workflow.HelloWorkflow, name)
 		if err != nil {
 			c.JSON(400, gin.H{"err": err.Error()})
 			return
@@ -37,15 +35,3 @@ func Hello(cli client.Client) gin.HandlerFunc {
 }
 
 const HelloTaskQueue = "HELLO_TASK_QUEUE"
-
-// Workflow functions are where you configure and organize the execution of Activity functions
-func HelloWorkflow(ctx workflow.Context, name string) (string, error) {
-	options := workflow.ActivityOptions{
-		StartToCloseTimeout: time.Second * 5,
-	}
-	ctx = workflow.WithActivityOptions(ctx, options)
-
-	var result string
-	err := workflow.ExecuteActivity(ctx, activity.HelloActivity, name).Get(ctx, &result)
-	return result, err
-}
