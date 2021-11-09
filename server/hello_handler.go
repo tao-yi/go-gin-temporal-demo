@@ -1,4 +1,4 @@
-package handler
+package server
 
 import (
 	"context"
@@ -13,8 +13,7 @@ func Hello(cli client.Client) gin.HandlerFunc {
 		name := c.Query("name")
 
 		options := client.StartWorkflowOptions{
-			ID:        "greeting-workflow",
-			TaskQueue: HelloTaskQueue,
+			TaskQueue: workflow.TaskQueue,
 		}
 
 		ctx := context.Background()
@@ -33,5 +32,3 @@ func Hello(cli client.Client) gin.HandlerFunc {
 		c.JSON(200, gin.H{"result": greeting})
 	}
 }
-
-const HelloTaskQueue = "HELLO_TASK_QUEUE"

@@ -1,23 +1,24 @@
-package worker
+package workflow
 
 import (
 	"log"
 
-	"github.com/tao-yi/go-gin-temporal-demo/activity"
-	"github.com/tao-yi/go-gin-temporal-demo/handler"
-	"github.com/tao-yi/go-gin-temporal-demo/workflow"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
+
+const TaskQueue = "TASK_QUEUE"
 
 type temporalWorker struct {
 	worker.Worker
 }
 
 func New(c client.Client) *temporalWorker {
-	w := worker.New(c, handler.HelloTaskQueue, worker.Options{})
-	w.RegisterWorkflow(workflow.HelloWorkflow)
-	w.RegisterActivity(activity.HelloActivity)
+	w := worker.New(c, TaskQueue, worker.Options{})
+	w.RegisterWorkflow(HelloWorkflow)
+	w.RegisterWorkflow(CronJobWorkflow)
+	w.RegisterActivity(HelloActivity)
+	w.RegisterActivity(CrobJobActivity)
 
 	return &temporalWorker{Worker: w}
 }

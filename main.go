@@ -4,9 +4,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tao-yi/go-gin-temporal-demo/handler"
 	"github.com/tao-yi/go-gin-temporal-demo/server"
-	"github.com/tao-yi/go-gin-temporal-demo/worker"
+	"github.com/tao-yi/go-gin-temporal-demo/workflow"
 	"go.temporal.io/sdk/client"
 )
 
@@ -26,13 +25,15 @@ func main() {
 	defer c.Close()
 
 	r := gin.Default()
-	w := worker.New(c)
+	w := workflow.New(c)
 
-	r.GET("/hello", handler.Hello(c))
-	// r.GET("/cronjob", handler.GetCronJobS)
-	// r.POST("/cronjob", handler.CreateCronjob)
-	// r.DELETE("/cronjob", handler.DeleteCronjob)
-	// r.PUT("/cronjob", handler.UpdateCronjob)
+	r.GET("/hello", server.Hello(c))
+	r.POST("/cronjob", server.CreateCronJob(c))
+	r.GET("/cronjob/:workflowId/cronschedule", server.GetCronJobSchedule(c))
+	r.GET("/cronjob/:workflowId", server.GetCronJob(c))
+	r.GET("/cronjob", server.ListCronJobs(c))
+	r.DELETE("/cronjob/:workflowId", server.DeleteCronJob(c))
+	r.PUT("/cronjob", server.UpdateCronjob(c))
 
 	w.Start()
 
